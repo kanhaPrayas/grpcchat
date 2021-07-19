@@ -1,2 +1,3 @@
 chatlog: "chat.log"
+serverip: "localhost"
 serverport: 8080

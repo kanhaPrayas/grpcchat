@@ -10,6 +10,7 @@ import (
 //Conf struct is the struct for the config.yaml
 type Conf struct {
 	ChatLog    string `yaml:"chatlog"`
+	ServerIP   string `yaml:"serverip"`
 	Serverport int    `yaml:"serverport"`
 }
 

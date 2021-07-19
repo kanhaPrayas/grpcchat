@@ -4,6 +4,11 @@ package proto;
 
 option go_package = ".";
 
+message Room {
+  string id = 1;
+  string name = 2;
+}
+
 message User {
   string id = 1;
   string name = 2;
@@ -14,11 +19,13 @@ message Message {
   string name = 2;
   string content = 3;
   string timestamp = 4;
+  string room = 5;
 }
 
 message Connect {
   User user = 1;
   bool active = 2;
+  Room room = 3;
 }
 
 message Close {}
