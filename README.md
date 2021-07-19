@@ -44,7 +44,7 @@ Note: Please update the above url as per your config
 #### Body: 
 {
   "name": "Prayas",
-  "room": "Private",
+  "roomname": "Private",
   "message": "Hello I am over HTTP"
 }
 
