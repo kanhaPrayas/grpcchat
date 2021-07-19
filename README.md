@@ -1,3 +1,7 @@
+Code Reference:
+https://github.com/tensor-programming/docker_grpc_chat_tutorial
+
+
 # grpcchat
 This repo contains a chat server written using protobuf and GRPC to support broadcast and receive messages from multiple clients. There are features like Chat over a Private room, Ignore an User's messages.  
 This also has a api service which can fetch all messages and post messages over HTTP.
