@@ -9,9 +9,10 @@ import (
 
 //Conf struct is the struct for the config.yaml
 type Conf struct {
-	ChatLog    string `yaml:"chatlog"`
-	ServerIP   string `yaml:"serverip"`
-	Serverport int    `yaml:"serverport"`
+	ChatLog       string `yaml:"chatlog"`
+	ServerIP      string `yaml:"serverip"`
+	Serverport    int    `yaml:"serverport"`
+	ApiServerPort int    `yaml:"apiserverport"`
 }
 
 //GetConf returns the config for the GRPC chat server

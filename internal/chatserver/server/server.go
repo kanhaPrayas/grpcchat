@@ -18,6 +18,7 @@ type Connection struct {
 	stream  proto.Broadcast_CreateStreamServer
 	id      string
 	room_id string
+	blocked string
 	active  bool
 	error   chan error
 }
@@ -36,6 +37,7 @@ func (s *Server) CreateStream(pconn *proto.Connect, stream proto.Broadcast_Creat
 		id:      pconn.User.Id,
 		active:  true,
 		room_id: pconn.Room.Id,
+		blocked: pconn.Blocked,
 		error:   make(chan error),
 	}
 
@@ -50,13 +52,17 @@ func (s *Server) BroadcastMessage(ctx context.Context, msg *proto.Message) (*pro
 	done := make(chan int)
 
 	//Append messages to the chat log
-	if _, err := s.FileDesc.Write([]byte(msg.Name + ":" + msg.Content + "\n")); err != nil {
+	if _, err := s.FileDesc.Write([]byte(msg.Name + ":" + msg.Timestamp + ":" + msg.Content + "\n")); err != nil {
 		s.GrpcLog.Fatal(err)
 	}
 	for _, conn := range s.Connection {
 
 		//Skip clients if they are not part of the message's chat room
 		if msg.Room != conn.room_id {
+			continue
+		}
+		//Skip messages from blocked users
+		if conn.blocked == msg.Name {
 			continue
 		}
 		wait.Add(1)

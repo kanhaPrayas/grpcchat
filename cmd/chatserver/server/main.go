@@ -27,7 +27,7 @@ func init() {
 	cnf = cnf.GetConf(config)
 	grpcLog = glog.NewLoggerV2(os.Stdout, os.Stdout, os.Stdout)
 	// If the file doesn't exist, create it, or append to the file
-	fileDesc, err = os.OpenFile("chat.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	fileDesc, err = os.OpenFile(cnf.ChatLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		grpcLog.Fatal(err)
 	}

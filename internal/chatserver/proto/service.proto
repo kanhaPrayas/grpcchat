@@ -26,6 +26,7 @@ message Connect {
   User user = 1;
   bool active = 2;
   Room room = 3;
+  string blocked = 4;
 }
 
 message Close {}

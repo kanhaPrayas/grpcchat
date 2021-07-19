@@ -1,3 +1,4 @@
-chatlog: "chat.log"
+chatlog: "/Users/MaaBapa/dev/grpcchat/chat.log"
 serverip: "localhost"
 serverport: 8080
+apiserverport: 8000

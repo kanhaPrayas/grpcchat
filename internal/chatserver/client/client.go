@@ -23,21 +23,23 @@ const (
 
 //Client struct is the struct for the connected chat client
 type Client struct {
-	Wg        *sync.WaitGroup
-	Client    proto.BroadcastClient
-	Name      string
-	RoomName  string
-	Timestamp string
-	conf      *conf.Conf
+	Wg          *sync.WaitGroup
+	Client      proto.BroadcastClient
+	Name        string
+	RoomName    string
+	BlockedName string
+	Timestamp   string
+	conf        *conf.Conf
 }
 
 func (c *Client) Connect(user *proto.User, room *proto.Room) error {
 	var streamerror error
 
 	stream, err := c.Client.CreateStream(context.Background(), &proto.Connect{
-		User:   user,
-		Room:   room,
-		Active: true,
+		User:    user,
+		Room:    room,
+		Active:  true,
+		Blocked: c.BlockedName,
 	})
 
 	if err != nil {
@@ -70,12 +72,12 @@ func (c *Client) initialize() {
 }
 
 //Exec method is used to be called by the main function to initiate chat client
-func (c *Client) Exec(name string, room_name string) {
+func (c *Client) Exec() {
 
 	c.initialize()
 	done := make(chan int)
-	user_id_byte := sha256.Sum256([]byte(c.Timestamp + name))
-	room_id_byte := sha256.Sum256([]byte(room_name))
+	user_id_byte := sha256.Sum256([]byte(c.Timestamp + c.Name))
+	room_id_byte := sha256.Sum256([]byte(c.RoomName))
 
 	address := fmt.Sprintf("%s:%d", c.conf.ServerIP, c.conf.Serverport)
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
@@ -85,11 +87,11 @@ func (c *Client) Exec(name string, room_name string) {
 	c.Client = proto.NewBroadcastClient(conn)
 	user := &proto.User{
 		Id:   hex.EncodeToString(user_id_byte[:]),
-		Name: name,
+		Name: c.Name,
 	}
 	room := &proto.Room{
 		Id:   hex.EncodeToString(room_id_byte[:]),
-		Name: room_name,
+		Name: c.RoomName,
 	}
 	c.Connect(user, room)
 	c.Wg.Add(1)
@@ -121,4 +123,37 @@ func (c *Client) ReadMessage(user *proto.User, room *proto.Room) {
 			break
 		}
 	}
+}
+
+//ExecApi method is used to be called by the API to send messages
+func (c *Client) ExecApi(msgTxt string) (err error) {
+
+	c.initialize()
+	user_id_byte := sha256.Sum256([]byte(c.Timestamp + c.Name))
+	room_id_byte := sha256.Sum256([]byte(c.RoomName))
+
+	address := fmt.Sprintf("%s:%d", c.conf.ServerIP, c.conf.Serverport)
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		return err
+	}
+	c.Client = proto.NewBroadcastClient(conn)
+	user := &proto.User{
+		Id:   hex.EncodeToString(user_id_byte[:]),
+		Name: c.Name,
+	}
+	room := &proto.Room{
+		Id:   hex.EncodeToString(room_id_byte[:]),
+		Name: c.RoomName,
+	}
+	msg := &proto.Message{
+		Id:        user.Id,
+		Name:      user.Name,
+		Content:   msgTxt,
+		Timestamp: time.Now().String(),
+		Room:      room.Id,
+	}
+
+	_, err = c.Client.BroadcastMessage(context.Background(), msg)
+	return
 }
