@@ -45,8 +45,8 @@ func (api *Api) PostMessage(w http.ResponseWriter, r *http.Request) {
 		params.RoomName = room_name
 	}
 	client := &client.Client{
-		Name:        name,
-		RoomName:    room_name,
+		Name:        params.Name,
+		RoomName:    params.RoomName,
 		BlockedName: blocked_name,
 	}
 	fmt.Println(client.Name, client.RoomName)
